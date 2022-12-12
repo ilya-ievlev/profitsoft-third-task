@@ -1,4 +1,4 @@
-package com.profitsoft.first_task;
+package com.profitsoft.first_task.parallel_controller;
 
 import com.profitsoft.first_task.models.Person;
 import com.profitsoft.first_task.parsers.StaxParserXmlToJava;
@@ -39,7 +39,7 @@ public class ParallelController {
         executorService.awaitTermination(10, TimeUnit.DAYS); // TODO: 12.12.22 create good termination method from oracle
         for (CompletableFuture<List<Person>> listCompletableFuture : completableFuturesArray) {
             generalPersonList.addAll(listCompletableFuture.get());
-        }
+        } // TODO: 12.12.22 возможно сделать так же многопоточную запись элементов в общую коллекцию
         return generalPersonList;
     }
 
@@ -60,6 +60,6 @@ public class ParallelController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        } // TODO: 12.12.22 delete or end the random filling task
     }
 }

@@ -1,11 +1,1 @@
-{
-  "fineForSpeeding": {
-    "2000": 3450.0
-  },
-  "fineForDrunkDriving": {
-    "2034": 5660.0
-  },
-  "fineForRedLight": {
-    "2004": 1380.0
-  }
-}
+{"fineForSpeeding":{"2000":3450.0},"fineForDrunkDriving":{"2034":5660.0},"fineForRedLight":{"2004":1380.0}}

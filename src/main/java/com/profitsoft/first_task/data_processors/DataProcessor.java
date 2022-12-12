@@ -1,6 +1,6 @@
 package com.profitsoft.first_task.data_processors;
 
-import com.profitsoft.first_task.ParallelController;
+import com.profitsoft.first_task.parallel_controller.ParallelController;
 import com.profitsoft.first_task.dto.SortedOutputDataTransferObject;
 import com.profitsoft.first_task.models.Person;
 import com.profitsoft.first_task.models.ViolationType;
