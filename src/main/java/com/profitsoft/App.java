@@ -21,7 +21,10 @@ public class App {
     }
 
     private static void startFirstTask() throws IOException, ExecutionException, InterruptedException {
+        long startTime = System.currentTimeMillis();
         JacksonJavaToJsonParser.parseData(inputFileFolderFirstTask);
+        double finalTime = (System.currentTimeMillis()-startTime)/1000D;
+        System.out.println(finalTime);
     }
 
     private static void startSecondTask(Path inputFile) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

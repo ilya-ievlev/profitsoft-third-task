@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 
 public class ParallelController {
     private static final boolean INITIAL_FILE_READ_STATE = false;
+    private static final String POOL_DID_NOT_TERMINATE = "Pool did not terminate";
 
     // TODO: 12.12.22 create util to check time of algorithm execution and pass it to console
     // TODO: 12.12.22 refactor fields and code, exceptions
@@ -20,27 +21,42 @@ public class ParallelController {
         ConcurrentHashMap<String, Boolean> processedFilesMap = new ConcurrentHashMap<>();
         fillInputFilesMap(inputFileFolder, processedFilesMap);
         List<Person> generalPersonList = new ArrayList<>();
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
         int numberOfFiles = inputFileFolder.listFiles().length;
         CompletableFuture<List<Person>>[] completableFuturesArray = new CompletableFuture[numberOfFiles];
         for (int i = 0; i < numberOfFiles; i++) {
             CompletableFuture<List<Person>> completableFuture = CompletableFuture.supplyAsync(() -> {
+                List<Person> personList = null;
                 for (Map.Entry<String, Boolean> entry : processedFilesMap.entrySet()) {
                     if (checkIfFileIsRead(entry.getKey(), processedFilesMap)) {
                         continue;
                     }
-                    return StaxParserXmlToJava.parseData((new File(entry.getKey())));
+                    personList = StaxParserXmlToJava.parseData((new File(entry.getKey())));
+                    break;
                 }
-                return null; // TODO: 11.12.22 change this thing
+                return personList;
             }, executorService);
             completableFuturesArray[i] = completableFuture;
         }
-        executorService.shutdown();
-        executorService.awaitTermination(10, TimeUnit.DAYS); // TODO: 12.12.22 create good termination method from oracle
+        shutdownExecutor(executorService);
         for (CompletableFuture<List<Person>> listCompletableFuture : completableFuturesArray) {
             generalPersonList.addAll(listCompletableFuture.get());
-        } // TODO: 12.12.22 возможно сделать так же многопоточную запись элементов в общую коллекцию
+        }
         return generalPersonList;
+    }
+
+    private static void shutdownExecutor(ExecutorService executorService) {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(30, TimeUnit.MINUTES)) {
+                executorService.shutdownNow();
+                if (!executorService.awaitTermination(30, TimeUnit.MINUTES))
+                    System.err.println(POOL_DID_NOT_TERMINATE);
+            }
+        } catch (InterruptedException ie) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static synchronized boolean checkIfFileIsRead(String filePath, Map<String, Boolean> processedFilesMap) {
@@ -60,6 +76,6 @@ public class ParallelController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } // TODO: 12.12.22 delete or end the random filling task
+        }
     }
 }
