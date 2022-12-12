@@ -1,0 +1,9 @@
+<fines>
+    <person>
+        <date_time>2000-03-05 15:39:03</date_time>
+        <first_name>john</first_name>
+        <last_name>chandler</last_name>
+        <type>SPEEDING</type>
+        <fine_amount>3450.00</fine_amount>
+    </person>
+</fines>

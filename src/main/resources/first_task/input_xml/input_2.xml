@@ -1,0 +1,9 @@
+<fines>
+    <person>
+        <date_time>2004-01-05 11:32:03</date_time>
+        <first_name>todd</first_name>
+        <last_name>elliot</last_name>
+        <type>RED_LIGHT</type>
+        <fine_amount>1380.00</fine_amount>
+    </person>
+</fines>
