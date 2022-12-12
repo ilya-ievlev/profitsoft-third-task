@@ -140,3 +140,7 @@ buildNumber.properties
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij+all,maven
+src/main/resources/first_task/input_xml/input_1.xml
+src/main/resources/first_task/input_xml/input_2.xml
+src/main/resources/first_task/input_xml/input_3.xml
+src/main/resources/first_task/output_json/output.json
