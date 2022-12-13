@@ -28,6 +28,7 @@ public class PropertiesLoader {
     private static final String FILE_INPUT_STREAM_ERROR = "fileInputStream error";
     private static final String MUST_BE_WITH_PROPERTY_ANNOTATION_AND_USER_FORMAT = "must be with Property annotation and user format";
     private static final String DEFAULT_FORMAT_IN_ANNOTATION = "";
+    private static final String WRONG_PROPERTIES_FILE = "wrong properties file";
 
     public static <T> T loadFromProperties(Class<T> cls, Path propertiesPath) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         T classObj = cls.getDeclaredConstructor().newInstance();
@@ -50,9 +51,7 @@ public class PropertiesLoader {
                 if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
                         && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
                         || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
-                    if (objectFieldName.equals(NUMBER_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
-                    } else if (nameInPropertyAnnotation.equals(NUMBER_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
+                    if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
                         field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
                     } else {
                         throw new IllegalArgumentException(CANT_SET_NUMBER_PROPERTY);
@@ -65,9 +64,7 @@ public class PropertiesLoader {
                 if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
                         && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
                         || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
-                    if (objectFieldName.equals(STRING_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.set(classObj, propertiesFromFile.get(STRING_PROPERTY));
-                    } else if (nameInPropertyAnnotation.equals(STRING_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
+                    if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
                         field.set(classObj, propertiesFromFile.get(STRING_PROPERTY));
                     } else {
                         throw new IllegalArgumentException(CANT_SET_NAME_PROPERTY);
@@ -83,9 +80,7 @@ public class PropertiesLoader {
                     if (field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).format().equals(DEFAULT_FORMAT_IN_ANNOTATION))) {
                         userDateTimeFormat = field.getAnnotation(Property.class).format();
                     } else throw new IllegalArgumentException(MUST_BE_WITH_PROPERTY_ANNOTATION_AND_USER_FORMAT);
-                    if (objectFieldName.equals(TIME_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
-                    } else if (nameInPropertyAnnotation.equals(TIME_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
+                    if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
                         field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
                     } else {
                         throw new IllegalArgumentException(CANT_SET_DATE_TIME_PROPERTY);
@@ -109,7 +104,7 @@ public class PropertiesLoader {
         }
         for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
             if (entry.getValue() == null) {
-                throw new IllegalArgumentException("wrong properties file");
+                throw new IllegalArgumentException(WRONG_PROPERTIES_FILE);
             }
         }
         return propertiesMap;
