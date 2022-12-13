@@ -45,45 +45,36 @@ public class PropertiesLoader {
 
 
             if (objectFieldName.equals(NUMBER_PROPERTY) || nameInPropertyAnnotation.equals(NUMBER_PROPERTY)) {
-                if (isFieldNameInAnnotationContainsInPropertiesFile ||
-                        (nameInPropertyAnnotation.equals(DEFAULT_NAME_IN_ANNOTATION) && isFieldNameFromObjectContainsInPropertiesFile)) {
-                    if (objectFieldName.equals(NUMBER_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY))); // TODO: 12.12.22 throw exception is not parsed
-                    } else if (nameInPropertyAnnotation.equals(NUMBER_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
-                        field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
-                    } else {
-                        throw new IllegalArgumentException(CANT_SET_NUMBER_PROPERTY);
-                    }
+                if (objectFieldName.equals(NUMBER_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
+                    field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
+                } else if (nameInPropertyAnnotation.equals(NUMBER_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
+                    field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
+                } else {
+                    throw new IllegalArgumentException(CANT_SET_NUMBER_PROPERTY);
                 }
             }
 
             if (objectFieldName.equals(STRING_PROPERTY) || nameInPropertyAnnotation.equals(STRING_PROPERTY)) {
-                if (isFieldNameInAnnotationContainsInPropertiesFile ||
-                        (nameInPropertyAnnotation.equals(DEFAULT_NAME_IN_ANNOTATION) && isFieldNameFromObjectContainsInPropertiesFile)) {
-                    if (objectFieldName.equals(STRING_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.set(classObj, propertiesFromFile.get(STRING_PROPERTY)); // TODO: 12.12.22 throw exception is not parsed
-                    } else if (nameInPropertyAnnotation.equals(STRING_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
-                        field.set(classObj, propertiesFromFile.get(STRING_PROPERTY));
-                    } else {
-                        throw new IllegalArgumentException(CANT_SET_NAME_PROPERTY);
-                    }
+                if (objectFieldName.equals(STRING_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
+                    field.set(classObj, propertiesFromFile.get(STRING_PROPERTY));
+                } else if (nameInPropertyAnnotation.equals(STRING_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
+                    field.set(classObj, propertiesFromFile.get(STRING_PROPERTY));
+                } else {
+                    throw new IllegalArgumentException(CANT_SET_NAME_PROPERTY);
                 }
             }
 
             if (objectFieldName.equals(TIME_PROPERTY) || nameInPropertyAnnotation.equals(TIME_PROPERTY)) {
-                if (isFieldNameInAnnotationContainsInPropertiesFile ||
-                        (nameInPropertyAnnotation.equals(DEFAULT_NAME_IN_ANNOTATION) && isFieldNameFromObjectContainsInPropertiesFile)) {
-                    String userDateTimeFormat;
-                    if (field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).format().equals(DEFAULT_FORMAT_IN_ANNOTATION))) {
-                        userDateTimeFormat = field.getAnnotation(Property.class).format();
-                    } else throw new IllegalArgumentException(MUST_BE_WITH_PROPERTY_ANNOTATION_AND_USER_FORMAT);
-                    if (objectFieldName.equals(TIME_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
-                    } else if (nameInPropertyAnnotation.equals(TIME_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
-                        field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
-                    } else {
-                        throw new IllegalArgumentException(CANT_SET_DATE_TIME_PROPERTY);
-                    }
+                String userDateTimeFormat;
+                if (field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).format().equals(DEFAULT_FORMAT_IN_ANNOTATION))) {
+                    userDateTimeFormat = field.getAnnotation(Property.class).format();
+                } else throw new IllegalArgumentException(MUST_BE_WITH_PROPERTY_ANNOTATION_AND_USER_FORMAT);
+                if (objectFieldName.equals(TIME_PROPERTY) && isFieldNameFromObjectContainsInPropertiesFile) {
+                    field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
+                } else if (nameInPropertyAnnotation.equals(TIME_PROPERTY) && isFieldNameInAnnotationContainsInPropertiesFile) {
+                    field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
+                } else {
+                    throw new IllegalArgumentException(CANT_SET_DATE_TIME_PROPERTY);
                 }
             }
         }
@@ -100,6 +91,11 @@ public class PropertiesLoader {
             propertiesMap.put(TIME_PROPERTY, property.getProperty(TIME_PROPERTY));
         } catch (IOException e) {
             throw new IllegalArgumentException(FILE_INPUT_STREAM_ERROR, e);
+        }
+        for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
+            if (entry.getValue() == null) {
+                throw new IllegalArgumentException("wrong properties file");
+            }
         }
         return propertiesMap;
     }

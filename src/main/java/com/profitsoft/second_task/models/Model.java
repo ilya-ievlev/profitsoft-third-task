@@ -3,6 +3,7 @@ package com.profitsoft.second_task.models;
 import com.profitsoft.second_task.annotations.Property;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class Model {
     private String stringProperty;
@@ -44,5 +45,18 @@ public class Model {
                 ", myNumber=" + myNumber +
                 ", timeProperty=" + timeProperty +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Model model = (Model) o;
+        return myNumber == model.myNumber && Objects.equals(stringProperty, model.stringProperty) && Objects.equals(timeProperty, model.timeProperty);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stringProperty, myNumber, timeProperty);
     }
 }

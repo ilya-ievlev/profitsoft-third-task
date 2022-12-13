@@ -6,6 +6,7 @@ import com.profitsoft.first_task.models.Person;
 import com.profitsoft.first_task.models.ViolationType;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -13,11 +14,11 @@ import static java.util.stream.Collectors.toMap;
 
 public class DataProcessor {
 
-    public static SortedOutputDataTransferObject processData(File inputFileFolder) throws ExecutionException, InterruptedException {
+    public static SortedOutputDataTransferObject processData(File inputFileFolder) throws ExecutionException, InterruptedException, IOException {
         Map<Integer, Double> violationsOfSpeeding = new HashMap<>();
         Map<Integer, Double> violationsOfDrunkDriving = new HashMap<>();
         Map<Integer, Double> violationsOfRedLight = new HashMap<>();
-        List<Person> unsortedPersonList = ParallelController.run(inputFileFolder);
+        List<Person> unsortedPersonList = ParallelController.parallelReadFiles(inputFileFolder);
         for (Person person : unsortedPersonList) {
             if (person.getViolationType().equals(ViolationType.DRUNK_DRIVING)) {
                 addFineToExistingAmountInMapOrAddNewYear(violationsOfDrunkDriving, person);

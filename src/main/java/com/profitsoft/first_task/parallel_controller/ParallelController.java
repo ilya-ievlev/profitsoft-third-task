@@ -14,11 +14,8 @@ public class ParallelController {
     private static final boolean INITIAL_FILE_READ_STATE = false;
     private static final String POOL_DID_NOT_TERMINATE = "Pool did not terminate";
 
-    // TODO: 12.12.22 create util to check time of algorithm execution and pass it to console
-    // TODO: 12.12.22 refactor fields and code, exceptions
-    // TODO: 12.12.22 refactor exceptions, method names, file paths
-    public static List<Person> run(File inputFileFolder) throws ExecutionException, InterruptedException {
-        ConcurrentHashMap<String, Boolean> processedFilesMap = new ConcurrentHashMap<>();
+    public static List<Person> parallelReadFiles(File inputFileFolder) throws ExecutionException, InterruptedException, IOException {
+        Map<String, Boolean> processedFilesMap = new ConcurrentHashMap<>();
         fillInputFilesMap(inputFileFolder, processedFilesMap);
         List<Person> generalPersonList = new ArrayList<>();
         ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -68,14 +65,10 @@ public class ParallelController {
         return false;
     }
 
-    private static void fillInputFilesMap(File inputFileFolder, Map<String, Boolean> processedFilesMap) {
+    private static void fillInputFilesMap(File inputFileFolder, Map<String, Boolean> processedFilesMap) throws IOException {
         File[] fileList = inputFileFolder.listFiles();
         for (File file : fileList) {
-            try {
-                processedFilesMap.put(file.getCanonicalPath(), INITIAL_FILE_READ_STATE);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                processedFilesMap.put(file.getPath(), INITIAL_FILE_READ_STATE);
         }
     }
 }

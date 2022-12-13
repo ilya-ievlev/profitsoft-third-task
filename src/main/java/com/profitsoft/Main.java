@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
-public class App {
+public class Main {
     private static final File inputFileFolderFirstTask = new File("src/main/resources/first_task/input_xml");
     private static final Path inputFileSecondTask = Paths.get("src/main/resources/second_task/class_params.properties");
 
