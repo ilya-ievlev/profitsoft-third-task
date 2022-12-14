@@ -14,11 +14,18 @@ import static java.util.stream.Collectors.toMap;
 
 public class DataProcessor {
 
-    public static SortedOutputDataTransferObject processData(File inputFileFolder) throws ExecutionException, InterruptedException, IOException {
+    private static final String EXCEPTION_WITH_PARALLEL_CONTROLLER_CAN_T_GET_UNSORTED_PERSON_LIST = "exception with parallelController, can't get unsortedPersonList";
+
+    public static SortedOutputDataTransferObject processData(File inputFileFolder) throws ExecutionException {
         Map<Integer, Double> violationsOfSpeeding = new HashMap<>();
         Map<Integer, Double> violationsOfDrunkDriving = new HashMap<>();
         Map<Integer, Double> violationsOfRedLight = new HashMap<>();
-        List<Person> unsortedPersonList = ParallelController.parallelReadFiles(inputFileFolder);
+        List<Person> unsortedPersonList;
+        try {
+            unsortedPersonList = ParallelController.parallelReadFiles(inputFileFolder);
+        } catch (ExecutionException e) {
+            throw new ExecutionException(EXCEPTION_WITH_PARALLEL_CONTROLLER_CAN_T_GET_UNSORTED_PERSON_LIST, e);
+        }
         for (Person person : unsortedPersonList) {
             if (person.getViolationType().equals(ViolationType.DRUNK_DRIVING)) {
                 addFineToExistingAmountInMapOrAddNewYear(violationsOfDrunkDriving, person);

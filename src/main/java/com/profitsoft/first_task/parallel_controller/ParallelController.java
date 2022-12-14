@@ -14,7 +14,7 @@ public class ParallelController {
     private static final boolean INITIAL_FILE_READ_STATE = false;
     private static final String POOL_DID_NOT_TERMINATE = "Pool did not terminate";
 
-    public static List<Person> parallelReadFiles(File inputFileFolder) throws ExecutionException, InterruptedException, IOException {
+    public static List<Person> parallelReadFiles(File inputFileFolder) throws ExecutionException {
         Map<String, Boolean> processedFilesMap = new ConcurrentHashMap<>();
         fillInputFilesMap(inputFileFolder, processedFilesMap);
         List<Person> generalPersonList = new ArrayList<>();
@@ -23,21 +23,17 @@ public class ParallelController {
         CompletableFuture<List<Person>>[] completableFuturesArray = new CompletableFuture[numberOfFiles];
         for (int i = 0; i < numberOfFiles; i++) {
             CompletableFuture<List<Person>> completableFuture = CompletableFuture.supplyAsync(() -> {
-                List<Person> personList = null;
-                for (Map.Entry<String, Boolean> entry : processedFilesMap.entrySet()) {
-                    if (checkIfFileIsRead(entry.getKey(), processedFilesMap)) {
-                        continue;
-                    }
-                    personList = StaxParserXmlToJava.parseData((new File(entry.getKey())));
-                    break;
-                }
-                return personList;
+                return read(processedFilesMap);
             }, executorService);
             completableFuturesArray[i] = completableFuture;
         }
         shutdownExecutor(executorService);
         for (CompletableFuture<List<Person>> listCompletableFuture : completableFuturesArray) {
-            generalPersonList.addAll(listCompletableFuture.get());
+            try {
+                generalPersonList.addAll(listCompletableFuture.get());
+            } catch (InterruptedException | ExecutionException e) {
+                throw new ExecutionException("exception occured when adding data to list from CompletableFuture", e);
+            }
         }
         return generalPersonList;
     }
@@ -65,10 +61,22 @@ public class ParallelController {
         return false;
     }
 
-    private static void fillInputFilesMap(File inputFileFolder, Map<String, Boolean> processedFilesMap) throws IOException {
+    private static List<Person> read(Map<String, Boolean> processedFilesMap) {
+        List<Person> personList = null;
+        for (Map.Entry<String, Boolean> entry : processedFilesMap.entrySet()) {
+            if (checkIfFileIsRead(entry.getKey(), processedFilesMap)) {
+                continue;
+            }
+            personList = StaxParserXmlToJava.parseData((new File(entry.getKey())));
+            break;
+        }
+        return personList;
+    }
+
+    private static void fillInputFilesMap(File inputFileFolder, Map<String, Boolean> processedFilesMap){
         File[] fileList = inputFileFolder.listFiles();
         for (File file : fileList) {
-                processedFilesMap.put(file.getPath(), INITIAL_FILE_READ_STATE);
+            processedFilesMap.put(file.getPath(), INITIAL_FILE_READ_STATE);
         }
     }
 }
