@@ -36,49 +36,47 @@ public class PropertiesLoader {
         Field[] fields = cls.getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
+            String objectFieldName = field.getName();
+            String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
+            if (field.isAnnotationPresent(Property.class)) {
+                nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
+            }
+            boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
+            boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
 
-            parseNumberProperty(field, classObj, propertiesFromFile);
-            parseStringProperty(field, classObj, propertiesFromFile);
-            parseDateProperty(field, classObj, propertiesFromFile);
-
+            if (objectFieldName.equals(NUMBER_PROPERTY) || nameInPropertyAnnotation.equals(NUMBER_PROPERTY)) {
+                parseNumberProperty(field, classObj, propertiesFromFile, isFieldNameFromObjectContainsInPropertiesFile, isFieldNameInAnnotationContainsInPropertiesFile);
+            }
+            if (objectFieldName.equals(STRING_PROPERTY) || nameInPropertyAnnotation.equals(STRING_PROPERTY)) {
+                parseStringProperty(field, classObj, propertiesFromFile, isFieldNameFromObjectContainsInPropertiesFile, isFieldNameInAnnotationContainsInPropertiesFile);
+            }
+            if (objectFieldName.equals(TIME_PROPERTY) || nameInPropertyAnnotation.equals(TIME_PROPERTY)) {
+                parseDateProperty(field, classObj, propertiesFromFile, isFieldNameFromObjectContainsInPropertiesFile, isFieldNameInAnnotationContainsInPropertiesFile);
+            }
         }
         return classObj;
     }
 
-    private static void parseNumberProperty(Field field, Object classObj, Map<String, String> propertiesFromFile) throws IllegalAccessException {
-        String objectFieldName = field.getName();
-        String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
-        if (field.isAnnotationPresent(Property.class)) {
-            nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
-        }
-        boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
-        boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
-        if (objectFieldName.equals(NUMBER_PROPERTY) || nameInPropertyAnnotation.equals(NUMBER_PROPERTY)) {
-            //this is necessary in order to make the name in
-            // the annotation, if it is not default, take precedence over the variable name
-            if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
-                    && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
-                    || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
-                if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
-                    field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
-                } else {
-                    throw new IllegalArgumentException(CANT_SET_NUMBER_PROPERTY);
-                }
+    private static void parseNumberProperty(Field field, Object classObj, Map<String, String> propertiesFromFile,
+                                            boolean isFieldNameFromObjectContainsInPropertiesFile,
+                                            boolean isFieldNameInAnnotationContainsInPropertiesFile) throws IllegalAccessException {
+        //this is necessary in order to make the name in
+        // the annotation, if it is not default, take precedence over the variable name
+        if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
+                && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
+                || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
+            if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
+                field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
+            } else {
+                throw new IllegalArgumentException(CANT_SET_NUMBER_PROPERTY);
             }
         }
     }
 
 
-    private static void parseStringProperty(Field field, Object classObj, Map<String, String> propertiesFromFile) throws IllegalAccessException {
-        String objectFieldName = field.getName();
-        String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
-        if (field.isAnnotationPresent(Property.class)) {
-            nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
-        }
-        boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
-        boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
-
-        if (objectFieldName.equals(STRING_PROPERTY) || nameInPropertyAnnotation.equals(STRING_PROPERTY)) {
+    private static void parseStringProperty(Field field, Object classObj, Map<String, String> propertiesFromFile,
+                                            boolean isFieldNameFromObjectContainsInPropertiesFile,
+                                            boolean isFieldNameInAnnotationContainsInPropertiesFile) throws IllegalAccessException {
             if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
                     && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
                     || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
@@ -87,20 +85,12 @@ public class PropertiesLoader {
                 } else {
                     throw new IllegalArgumentException(CANT_SET_NAME_PROPERTY);
                 }
-            }
         }
     }
 
-    private static void parseDateProperty(Field field, Object classObj, Map<String, String> propertiesFromFile) throws IllegalAccessException {
-        String objectFieldName = field.getName();
-        String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
-        if (field.isAnnotationPresent(Property.class)) {
-            nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
-        }
-        boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
-        boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
-
-        if (objectFieldName.equals(TIME_PROPERTY) || nameInPropertyAnnotation.equals(TIME_PROPERTY)) {
+    private static void parseDateProperty(Field field, Object classObj, Map<String, String> propertiesFromFile,
+                                          boolean isFieldNameFromObjectContainsInPropertiesFile,
+                                          boolean isFieldNameInAnnotationContainsInPropertiesFile) throws IllegalAccessException {
             if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
                     && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
                     || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
@@ -114,7 +104,6 @@ public class PropertiesLoader {
                     throw new IllegalArgumentException(CANT_SET_DATE_TIME_PROPERTY);
                 }
             }
-        }
     }
 
     private static Map<String, String> loadPropertiesFile(Path inputFile) {
