@@ -44,51 +44,84 @@ public class PropertiesLoader {
             boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
             boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
 
+            parseNumberProperty(field, classObj, propertiesFromFile);
+            parseStringProperty(field, classObj, propertiesFromFile);
+            parseDateProperty(field, classObj, propertiesFromFile);
 
-            if (objectFieldName.equals(NUMBER_PROPERTY) || nameInPropertyAnnotation.equals(NUMBER_PROPERTY)) {
-                //this is necessary in order to make the name in
-                // the annotation, if it is not default, take precedence over the variable name
-                if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
-                        && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
-                        || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
-                    if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
-                    } else {
-                        throw new IllegalArgumentException(CANT_SET_NUMBER_PROPERTY);
-                    }
-                }
-            }
+        }
+        return classObj;
+    }
 
-
-            if (objectFieldName.equals(STRING_PROPERTY) || nameInPropertyAnnotation.equals(STRING_PROPERTY)) {
-                if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
-                        && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
-                        || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
-                    if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.set(classObj, propertiesFromFile.get(STRING_PROPERTY));
-                    } else {
-                        throw new IllegalArgumentException(CANT_SET_NAME_PROPERTY);
-                    }
-                }
-            }
-
-                if (objectFieldName.equals(TIME_PROPERTY) || nameInPropertyAnnotation.equals(TIME_PROPERTY)) {
-                    if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
-                            && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
-                            || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
-                    String userDateTimeFormat;
-                    if (field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).format().equals(DEFAULT_FORMAT_IN_ANNOTATION))) {
-                        userDateTimeFormat = field.getAnnotation(Property.class).format();
-                    } else throw new IllegalArgumentException(MUST_BE_WITH_PROPERTY_ANNOTATION_AND_USER_FORMAT);
-                    if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
-                        field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
-                    } else {
-                        throw new IllegalArgumentException(CANT_SET_DATE_TIME_PROPERTY);
-                    }
+    private static void parseNumberProperty(Field field, Object classObj, Map<String, String> propertiesFromFile) throws IllegalAccessException {
+        String objectFieldName = field.getName();
+        String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
+        if (field.isAnnotationPresent(Property.class)) {
+            nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
+        }
+        boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
+        boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
+        if (objectFieldName.equals(NUMBER_PROPERTY) || nameInPropertyAnnotation.equals(NUMBER_PROPERTY)) {
+            //this is necessary in order to make the name in
+            // the annotation, if it is not default, take precedence over the variable name
+            if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
+                    && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
+                    || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
+                if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
+                    field.setInt(classObj, Integer.parseInt(propertiesFromFile.get(NUMBER_PROPERTY)));
+                } else {
+                    throw new IllegalArgumentException(CANT_SET_NUMBER_PROPERTY);
                 }
             }
         }
-        return classObj;
+    }
+
+
+    private static void parseStringProperty(Field field, Object classObj, Map<String, String> propertiesFromFile) throws IllegalAccessException {
+        String objectFieldName = field.getName();
+        String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
+        if (field.isAnnotationPresent(Property.class)) {
+            nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
+        }
+        boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
+        boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
+
+        if (objectFieldName.equals(STRING_PROPERTY) || nameInPropertyAnnotation.equals(STRING_PROPERTY)) {
+            if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
+                    && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
+                    || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
+                if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
+                    field.set(classObj, propertiesFromFile.get(STRING_PROPERTY));
+                } else {
+                    throw new IllegalArgumentException(CANT_SET_NAME_PROPERTY);
+                }
+            }
+        }
+    }
+
+    private static void parseDateProperty(Field field, Object classObj, Map<String, String> propertiesFromFile) throws IllegalAccessException {
+        String objectFieldName = field.getName();
+        String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
+        if (field.isAnnotationPresent(Property.class)) {
+            nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
+        }
+        boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
+        boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
+
+        if (objectFieldName.equals(TIME_PROPERTY) || nameInPropertyAnnotation.equals(TIME_PROPERTY)) {
+            if ((field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))
+                    && isFieldNameInAnnotationContainsInPropertiesFile) || (!field.isAnnotationPresent(Property.class)
+                    || field.getAnnotation(Property.class).name().equals(DEFAULT_NAME_IN_ANNOTATION))) {
+                String userDateTimeFormat;
+                if (field.isAnnotationPresent(Property.class) && (!field.getAnnotation(Property.class).format().equals(DEFAULT_FORMAT_IN_ANNOTATION))) {
+                    userDateTimeFormat = field.getAnnotation(Property.class).format();
+                } else throw new IllegalArgumentException(MUST_BE_WITH_PROPERTY_ANNOTATION_AND_USER_FORMAT);
+                if (isFieldNameInAnnotationContainsInPropertiesFile || isFieldNameFromObjectContainsInPropertiesFile) {
+                    field.set(classObj, parseInstant(propertiesFromFile.get(TIME_PROPERTY), userDateTimeFormat));
+                } else {
+                    throw new IllegalArgumentException(CANT_SET_DATE_TIME_PROPERTY);
+                }
+            }
+        }
     }
 
     private static Map<String, String> loadPropertiesFile(Path inputFile) {
