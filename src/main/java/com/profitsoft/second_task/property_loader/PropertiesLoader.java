@@ -36,13 +36,6 @@ public class PropertiesLoader {
         Field[] fields = cls.getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
-            String objectFieldName = field.getName();
-            String nameInPropertyAnnotation = DEFAULT_NAME_IN_ANNOTATION;
-            if (field.isAnnotationPresent(Property.class)) {
-                nameInPropertyAnnotation = field.getDeclaredAnnotation(Property.class).name();
-            }
-            boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
-            boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
 
             parseNumberProperty(field, classObj, propertiesFromFile);
             parseStringProperty(field, classObj, propertiesFromFile);
