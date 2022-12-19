@@ -34,4 +34,10 @@ public class PropertiesLoaderTest {
         Path inputFileBigInteger = Paths.get("src/test/resources/class_params_bigInteger.properties");
         assertThrows(IllegalArgumentException.class, () -> PropertiesLoader.loadFromProperties(Model.class, inputFileBigInteger));
     }
+
+    @Test
+    void throwExceptionIfClassIsNull(){
+        Path inputFileCorrect = Paths.get("src/test/resources/class_params.properties");
+        assertThrows(IllegalArgumentException.class, ()-> PropertiesLoader.loadFromProperties(null, inputFileCorrect));
+    }
 }

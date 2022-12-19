@@ -31,6 +31,9 @@ public class PropertiesLoader {
     private static final String WRONG_PROPERTIES_FILE = "wrong properties file";
 
     public static <T> T loadFromProperties(Class<T> cls, Path propertiesPath) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        if(cls == null){
+            throw new IllegalArgumentException("class ref can't be null");
+        }
         T classObj = cls.getDeclaredConstructor().newInstance();
         Map<String, String> propertiesFromFile = loadPropertiesFile(propertiesPath);
         Field[] fields = cls.getDeclaredFields();
@@ -56,6 +59,7 @@ public class PropertiesLoader {
         }
         return classObj;
     }
+
 
     private static void parseNumberProperty(Field field, Object classObj, Map<String, String> propertiesFromFile,
                                             boolean isFieldNameFromObjectContainsInPropertiesFile,
