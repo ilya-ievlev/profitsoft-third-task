@@ -2,6 +2,7 @@ package com.profitsoft.second_task.property_loader;
 
 import com.profitsoft.second_task.models.Model;
 import com.profitsoft.second_task.models.ModelWithExtraFields;
+import com.profitsoft.second_task.models.ModelWithIncorrectFieldTypes;
 import com.profitsoft.second_task.models.ModelWithMissingField;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +57,7 @@ public class PropertiesLoaderTest {
     @Test
     void throwExceptionIfClassDoesNotHaveFieldWithRequiredParams() {
         Path inputFileCorrect = Paths.get("src/test/resources/class_params.properties");
-        assertThrows(IllegalArgumentException.class, ()-> PropertiesLoader.loadFromProperties(ModelWithMissingField.class, inputFileCorrect));
+        assertThrows(IllegalArgumentException.class, () -> PropertiesLoader.loadFromProperties(ModelWithMissingField.class, inputFileCorrect));
     }
 
     @Test
@@ -66,7 +67,7 @@ public class PropertiesLoaderTest {
     }
 
     @Test
-    void createRightModelFromProperties(){
+    void createRightModelFromProperties() {
         Path inputFileCorrect = Paths.get("src/test/resources/class_params.properties");
         Model model = new Model();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
@@ -83,6 +84,10 @@ public class PropertiesLoaderTest {
         }
     }
 
-
+    @Test
+    void throwsExceptionIfClassHasIncorrectFieldTypes(){
+        Path inputFileCorrect = Paths.get("src/test/resources/class_params.properties");
+        assertThrows(IllegalArgumentException.class, ()-> PropertiesLoader.loadFromProperties(ModelWithIncorrectFieldTypes.class, inputFileCorrect));
+    }
 
 }

@@ -30,7 +30,7 @@ public class PropertiesLoader {
     private static final String DEFAULT_FORMAT_IN_ANNOTATION = "";
     private static final String WRONG_PROPERTIES_FILE = "wrong properties file";
     private static final String PARAMETER_CAN_T_BE_NULL = "parameter can't be null";
-    private static final String THE_CLASS_HAS_EXTRA_FIELDS_OR_THE_FIELD_NAME_OR_ANNOTATION_DOES_NOT_MATCH_THE_PROPERTY_FILE = "the class has extra fields or the field name or annotation does not match the property file";
+    private static final String THE_CLASS_HAS_EXTRA_FIELDS_OR_THE_FIELD_ANNOTATION_DOES_NOT_MATCH_THE_PROPERTY_FILE = "the class has extra fields or the field/annotation does not match the property file";
 
     public static <T> T loadFromProperties(Class<T> cls, Path propertiesPath) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         if (cls == null || propertiesPath == null) {
@@ -49,19 +49,17 @@ public class PropertiesLoader {
             boolean isFieldNameFromObjectContainsInPropertiesFile = propertiesFromFile.containsKey(objectFieldName);
             boolean isFieldNameInAnnotationContainsInPropertiesFile = propertiesFromFile.containsKey(nameInPropertyAnnotation);
 
-            if (objectFieldName.equals(NUMBER_PROPERTY) || nameInPropertyAnnotation.equals(NUMBER_PROPERTY)) {
+            if (objectFieldName.equals(NUMBER_PROPERTY) || nameInPropertyAnnotation.equals(NUMBER_PROPERTY)
+                    && ((field.getType().equals(Integer.class) || field.getType().equals(int.class)))) {
                 parseNumberProperty(field, classObj, propertiesFromFile, isFieldNameFromObjectContainsInPropertiesFile, isFieldNameInAnnotationContainsInPropertiesFile);
-            }
-
-            else if (objectFieldName.equals(STRING_PROPERTY) || nameInPropertyAnnotation.equals(STRING_PROPERTY)) {
+            } else if (objectFieldName.equals(STRING_PROPERTY) || nameInPropertyAnnotation.equals(STRING_PROPERTY)
+                    && ((field.getType().equals(String.class)))) {
                 parseStringProperty(field, classObj, propertiesFromFile, isFieldNameFromObjectContainsInPropertiesFile, isFieldNameInAnnotationContainsInPropertiesFile);
-            }
-
-            else if (objectFieldName.equals(TIME_PROPERTY) || nameInPropertyAnnotation.equals(TIME_PROPERTY)) {
+            } else if (objectFieldName.equals(TIME_PROPERTY) || nameInPropertyAnnotation.equals(TIME_PROPERTY)
+                    && ((field.getType().equals(Instant.class)))) {
                 parseDateProperty(field, classObj, propertiesFromFile, isFieldNameFromObjectContainsInPropertiesFile, isFieldNameInAnnotationContainsInPropertiesFile);
-            }
-            else {
-                throw new IllegalArgumentException(THE_CLASS_HAS_EXTRA_FIELDS_OR_THE_FIELD_NAME_OR_ANNOTATION_DOES_NOT_MATCH_THE_PROPERTY_FILE);
+            } else {
+                throw new IllegalArgumentException(THE_CLASS_HAS_EXTRA_FIELDS_OR_THE_FIELD_ANNOTATION_DOES_NOT_MATCH_THE_PROPERTY_FILE);
             }
         }
         return classObj;
