@@ -13,6 +13,7 @@ import java.util.concurrent.*;
 public class ParallelController {
     private static final boolean INITIAL_FILE_READ_STATE = false;
     private static final String POOL_DID_NOT_TERMINATE = "Pool did not terminate";
+    private static final String EXCEPTION_OCCURRED_WHEN_ADDING_DATA_TO_LIST_FROM_COMPLETABLE_FUTURE = "exception occurred when adding data to list from CompletableFuture";
 
     public static List<Person> parallelReadFiles(File inputFileFolder) throws ExecutionException {
         Map<String, Boolean> processedFilesMap = new ConcurrentHashMap<>();
@@ -32,7 +33,7 @@ public class ParallelController {
             try {
                 generalPersonList.addAll(listCompletableFuture.get());
             } catch (InterruptedException | ExecutionException e) {
-                throw new ExecutionException("exception occured when adding data to list from CompletableFuture", e);
+                throw new ExecutionException(EXCEPTION_OCCURRED_WHEN_ADDING_DATA_TO_LIST_FROM_COMPLETABLE_FUTURE, e);
             }
         }
         return generalPersonList;
@@ -68,6 +69,7 @@ public class ParallelController {
                 continue;
             }
             personList = StaxParserXmlToJava.parseData((new File(entry.getKey())));
+
             break;
         }
         return personList;
