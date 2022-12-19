@@ -40,4 +40,9 @@ public class PropertiesLoaderTest {
         Path inputFileCorrect = Paths.get("src/test/resources/class_params.properties");
         assertThrows(IllegalArgumentException.class, ()-> PropertiesLoader.loadFromProperties(null, inputFileCorrect));
     }
+
+    @Test
+    void throwExceptionIfPathIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> PropertiesLoader.loadFromProperties(Model.class, null));
+    }
 }
